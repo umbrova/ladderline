@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, writeFileSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { load as parseYaml, dump as dumpYaml } from "js-yaml";
 import { PersonAlreadyTrackedError, InvalidRelationshipError, LadderNotFoundError } from "./errors.js";
@@ -54,7 +54,21 @@ export function trackPerson(
 }
 
 export function loadPerson(workspacePath: string, name: string): PersonRecord {
-  const path = join(workspacePath, slugify(name), "person.yaml");
+  return loadPersonBySlug(workspacePath, slugify(name));
+}
+
+export function loadPersonBySlug(workspacePath: string, slug: string): PersonRecord {
+  const path = join(workspacePath, slug, "person.yaml");
   const raw = readFileSync(path, "utf-8");
   return parseYaml(raw) as PersonRecord;
+}
+
+/** Every currently tracked person in this workspace — used by bulk case generation. */
+export function listTrackedPeople(
+  workspacePath: string
+): Array<{ slug: string; record: PersonRecord }> {
+  return readdirSync(workspacePath, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && entry.name !== "ladders")
+    .filter((entry) => existsSync(join(workspacePath, entry.name, "person.yaml")))
+    .map((entry) => ({ slug: entry.name, record: loadPersonBySlug(workspacePath, entry.name) }));
 }

@@ -154,3 +154,22 @@ export class InvalidDateRangeError extends LadderlineError {
     super(`Invalid cycle range: start (${start}) must be before end (${end}).`);
   }
 }
+
+export class CycleNotFoundError extends LadderlineError {
+  constructor(name: string, available: string[]) {
+    const closest = findClosestMatch(name, available);
+    super(
+      `"${name}" isn't a defined cycle.`,
+      closest ? `Did you mean: ${closest}?` : `Run: ladderline cycle add ${name} --start <date> --end <date>`
+    );
+  }
+}
+
+export class EmptyCaseError extends LadderlineError {
+  constructor(personName: string, cycleName: string) {
+    super(
+      `No notes found for ${personName} in cycle ${cycleName}.`,
+      `Nothing to build a case from yet.`
+    );
+  }
+}
