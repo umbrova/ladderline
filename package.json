@@ -1,0 +1,33 @@
+{
+  "name": "ladderline",
+  "version": "1.0.0",
+  "description": "Coming soon.",
+  "main": "index.js",
+  "type": "module",
+  "bin": {
+    "ladderline": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/cli.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/umbrova/ladderline.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/umbrova/ladderline/issues"
+  },
+  "homepage": "https://github.com/umbrova/ladderline#readme",
+  "devDependencies": {
+    "@types/node": "^26.1.0",
+    "tsx": "^4.23.0",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "commander": "^15.0.0"
+  }
+}
