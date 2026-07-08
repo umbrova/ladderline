@@ -6,6 +6,9 @@ import { runTrack } from "./commands/track.js";
 import { runNote } from "./commands/note.js";
 import { runCycleAdd, runCycleList } from "./commands/cycle.js";
 import { runCase } from "./commands/case.js";
+import { runNotagList } from "./commands/notag.js";
+import { runExport } from "./commands/export.js";
+import { runImport } from "./commands/import.js";
 
 const program = new Command();
 
@@ -91,6 +94,34 @@ program
       return;
     }
     await runCase(name ?? "", options);
+  });
+
+const notagCmd = program.command("notag").description("Manage untagged notes");
+
+notagCmd
+  .command("list")
+  .description("List notag entries, optionally for one person")
+  .option("--person <name>", "only show notag entries for this person")
+  .action((options: { person?: string }) => {
+    runNotagList(options);
+  });
+
+program
+  .command("export")
+  .description("Zip the workspace (or a filtered slice of it) for backup or sharing")
+  .option("--person <name>", "only export this person's notes")
+  .option("--cycle <name>", "only export notes from this cycle, across everyone")
+  .option("--since <date>", "only export notes logged on or after this date (YYYY-MM-DD)")
+  .action((options: { person?: string; cycle?: string; since?: string }) => {
+    runExport(options);
+  });
+
+program
+  .command("import <file>")
+  .description("Restore or merge a workspace from an exported zip")
+  .option("--force", "overwrite files that already exist with different content")
+  .action((file: string, options: { force?: boolean }) => {
+    runImport(file, options);
   });
 
 program.parse(process.argv);
