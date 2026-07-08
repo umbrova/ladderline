@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Ladderline</title>
+<style>
+  :root {
+    --border: #e2e2e2;
+    --muted: #757575;
+    --accent: #f0f4ff;
+    --accent-text: #3355dd;
+    --success-bg: #eaf7ee;
+    --success-text: #1a7a3a;
+    --danger-bg: #fdeaea;
+    --danger-text: #b32020;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 0; color: #1a1a1a; background: #fff; }
+  .topbar { display: flex; align-items: center; gap: 4px; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); }
+  .topbar h1 { font-size: 15px; margin: 0 20px 0 0; }
+  .tab-btn { border: none; background: none; padding: 6px 12px; border-radius: 6px; font-size: 13px; cursor: pointer; color: var(--muted); }
+  .tab-btn.active { background: var(--accent); color: var(--accent-text); font-weight: 500; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+  .layout { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 50px); }
+  .sidebar { border-right: 1px solid var(--border); padding: 1rem 0.75rem; }
+  .person-item { padding: 8px 10px; border-radius: 6px; cursor: pointer; margin-bottom: 2px; }
+  .person-item:hover { background: #f5f5f5; }
+  .person-item.active { background: var(--accent); }
+  .person-item.active .person-name { color: var(--accent-text); }
+  .person-name { font-size: 13px; font-weight: 500; margin: 0; }
+  .person-relationship { font-size: 11px; color: var(--muted); margin: 0; }
+  .main { padding: 1.25rem 1.5rem; }
+  .main-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px; }
+  .main-header h2 { font-size: 16px; margin: 0; }
+  .ladder-name { font-size: 12px; color: var(--muted); }
+  .subtitle { font-size: 12px; color: var(--muted); margin: 0 0 16px; }
+  .section-row { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; }
+  .section-row.empty { border-color: var(--danger-text); background: var(--danger-bg); }
+  .tag-name { font-size: 13px; font-weight: 500; margin: 0; }
+  .tag-snippet { font-size: 12px; color: var(--muted); margin: 0; }
+  .section-row.empty .tag-name, .section-row.empty .tag-snippet { color: var(--danger-text); }
+  .count-badge { font-size: 12px; padding: 2px 8px; border-radius: 6px; white-space: nowrap; background: var(--success-bg); color: var(--success-text); }
+  .count-badge.zero { background: var(--danger-bg); color: var(--danger-text); }
+  .last-date { font-size: 11px; color: var(--muted); white-space: nowrap; }
+  .empty-state { color: var(--muted); font-size: 13px; padding: 2rem; text-align: center; }
+  #grid-panel, #notes-panel { padding: 1.25rem 1.5rem; }
+  table.grid { border-collapse: collapse; width: 100%; font-size: 13px; }
+  table.grid th, table.grid td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+  table.grid th { color: var(--muted); font-weight: 500; font-size: 12px; }
+  .cell-count { font-weight: 500; }
+  .cell-count.zero { color: var(--danger-text); }
+  .cell-na { color: #ccc; }
+  .filters { display: flex; gap: 8px; margin-bottom: 16px; }
+  .filters select, .filters input { font-size: 12px; padding: 4px 8px; border: 1px solid var(--border); border-radius: 6px; }
+  .note-row { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; cursor: pointer; }
+  .note-row-summary { display: flex; justify-content: space-between; font-size: 13px; }
+  .note-row-raw { display: none; margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border); font-family: monospace; font-size: 12px; white-space: pre-wrap; color: #444; }
+  .note-row.expanded .note-row-raw { display: block; }
+  #insights-panel { padding: 1.25rem 1.5rem; }
+.insight-cards { display: flex; gap: 12px; margin-bottom: 20px; }
+.insight-card { flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
+.insight-card .big { font-size: 22px; font-weight: 600; margin: 0; }
+.insight-card .label { font-size: 12px; color: var(--muted); margin: 4px 0 0; }
+.insight-section-title { font-size: 13px; font-weight: 600; margin: 20px 0 8px; }
+.stale-row { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px solid var(--border); }
+.stale-row .warn { color: var(--danger-text); }
+.chart { display: flex; align-items: flex-end; gap: 6px; height: 100px; margin-top: 8px; }
+.chart-bar { background: var(--accent-text); width: 24px; border-radius: 3px 3px 0 0; position: relative; }
+.chart-bar .bar-label { position: absolute; top: -18px; left: 0; right: 0; text-align: center; font-size: 11px; color: var(--muted); }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <h1>Ladderline</h1>
+    <button class="tab-btn active" data-tab="person">Person</button>
+    <button class="tab-btn" data-tab="grid">Team grid</button>
+    <button class="tab-btn" data-tab="notes">Notes</button>
+    <button class="tab-btn" data-tab="insights">Insights</button>
+
+  </div>
+
+  <div class="tab-panel active" id="person-panel">
+    <div class="layout">
+      <div class="sidebar"><div id="person-list"></div></div>
+      <div class="main" id="main">
+        <div class="empty-state">Select a person to see their evidence overview.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="grid-panel"></div>
+  <div class="tab-panel" id="notes-panel"></div>
+  <div class="tab-panel" id="insights-panel"></div>
+
+<script>
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.tab + "-panel").classList.add("active");
+    if (btn.dataset.tab === "grid") loadTeamGrid();
+    if (btn.dataset.tab === "notes") loadNotes();
+    if (btn.dataset.tab === "insights") loadInsights();
+  });
+});
+
+async function loadPeople() {
+  const res = await fetch("/api/people");
+  const people = await res.json();
+  const list = document.getElementById("person-list");
+
+  if (people.length === 0) {
+    list.innerHTML = '<p style="font-size:12px;color:var(--muted);padding:0 4px;">No one tracked yet.</p>';
+    return;
+  }
+
+  list.innerHTML = people.map(p =>
+    `<div class="person-item" data-slug="${p.slug}">
+       <p class="person-name">${p.name}</p>
+       <p class="person-relationship">${p.as}</p>
+     </div>`
+  ).join("");
+
+  list.querySelectorAll(".person-item").forEach(el => {
+    el.addEventListener("click", () => selectPerson(el.dataset.slug));
+  });
+
+  selectPerson(people[0].slug);
+}
+
+async function selectPerson(slug) {
+  document.querySelectorAll(".person-item").forEach(el => {
+    el.classList.toggle("active", el.dataset.slug === slug);
+  });
+
+  const res = await fetch(`/api/people/${slug}/overview`);
+  const data = await res.json();
+  const main = document.getElementById("main");
+
+  if (data.error) {
+    main.innerHTML = `<div class="empty-state">${data.error}</div>`;
+    return;
+  }
+
+  const rows = data.sections.map(s => {
+    const isEmpty = s.noteCount === 0;
+    return `
+      <div class="section-row ${isEmpty ? "empty" : ""}">
+        <div>
+          <p class="tag-name">${s.tagName}</p>
+          <p class="tag-snippet">${isEmpty ? "No evidence logged yet." : s.latestSnippet}</p>
+        </div>
+        <span class="count-badge ${isEmpty ? "zero" : ""}">${s.noteCount} note${s.noteCount === 1 ? "" : "s"}</span>
+        <span class="last-date">${s.lastDate ?? "—"}</span>
+      </div>`;
+  }).join("");
+
+  main.innerHTML = `
+    <div class="main-header">
+      <h2>${data.personName}</h2>
+      <span class="ladder-name">${data.ladderName}</span>
+    </div>
+    <p class="subtitle">${data.totalNotes} note${data.totalNotes === 1 ? "" : "s"} logged, all time</p>
+    ${rows}
+  `;
+}
+
+async function loadTeamGrid() {
+  const res = await fetch("/api/team-grid");
+  const data = await res.json();
+  const panel = document.getElementById("grid-panel");
+
+  if (data.rows.length === 0) {
+    panel.innerHTML = '<div class="empty-state">No one tracked yet.</div>';
+    return;
+  }
+
+  const header = `<tr><th>Person</th>${data.tags.map(t => `<th>${t.name}</th>`).join("")}</tr>`;
+  const rows = data.rows.map(row => {
+    const cells = data.tags.map(t => {
+      const cell = row.cells[t.id];
+      if (cell === null) return `<td class="cell-na">—</td>`;
+      const zero = cell.noteCount === 0;
+      return `<td><span class="cell-count ${zero ? "zero" : ""}">${cell.noteCount}</span>${cell.lastDate ? ` <span class="last-date">(${cell.lastDate})</span>` : ""}</td>`;
+    }).join("");
+    return `<tr><td>${row.name}</td>${cells}</tr>`;
+  }).join("");
+
+  panel.innerHTML = `<table class="grid">${header}${rows}</table>`;
+}
+
+async function loadNotes(filters = {}) {
+  const params = new URLSearchParams(filters);
+  const res = await fetch(`/api/notes?${params}`);
+  const notes = await res.json();
+  const panel = document.getElementById("notes-panel");
+
+  const rows = notes.length === 0
+    ? '<div class="empty-state">No notes match this filter.</div>'
+    : notes.map((n, i) => `
+        <div class="note-row" data-idx="${i}">
+          <div class="note-row-summary">
+            <span><strong>${n.date}</strong> — ${n.personName} — ${n.tag ?? "(notag)"}</span>
+          </div>
+          <div class="note-row-raw">person: ${n.personName}
+filename: ${n.filename}
+tag: ${n.tag ?? "(none)"}
+cycle: ${n.cycle ?? "(none)"}
+date: ${n.date}
+
+${n.body}</div>
+        </div>`).join("");
+
+  panel.innerHTML = `
+    <div class="filters">
+      <input type="text" id="filter-person" placeholder="Filter by person..." value="${filters.person ?? ""}" />
+    <label><input type="checkbox" id="filter-notag" ${filters.notagOnly === "true" ? "checked" : ""} /> notag only</label>
+    </div>
+    ${rows}
+  `;
+
+  panel.querySelectorAll(".note-row").forEach(el => {
+    el.addEventListener("click", () => el.classList.toggle("expanded"));
+  });
+
+  document.getElementById("filter-person").addEventListener("change", (e) => {
+    loadNotes({ ...filters, person: e.target.value });
+  });
+  document.getElementById("filter-notag").addEventListener("change", (e) => {
+    loadNotes({ ...filters, notagOnly: e.target.checked ? "true" : "" });
+  });
+}
+async function loadInsights() {
+  const res = await fetch("/api/insights");
+  const data = await res.json();
+  const panel = document.getElementById("insights-panel");
+
+  const staleRows = data.goingStale.length === 0
+    ? '<p style="font-size:12px;color:var(--muted);">Nothing is stale — nice.</p>'
+    : data.goingStale.slice(0, 10).map(s => `
+        <div class="stale-row">
+          <span>${s.personName} — ${s.tagName}</span>
+          <span class="warn">${s.daysSinceLastNote === null ? "no notes yet" : `no notes in ${s.daysSinceLastNote} days`}</span>
+        </div>`).join("");
+
+  const maxCount = Math.max(1, ...data.cadence.map(c => c.count));
+  const chartBars = data.cadence.map(c => `
+    <div class="chart-bar" style="height:${(c.count / maxCount) * 100}px;">
+      <span class="bar-label">${c.count}</span>
+    </div>`).join("");
+
+  const readinessRows = data.cycleReadiness.length === 0
+    ? '<p style="font-size:12px;color:var(--muted);">No cycles defined yet.</p>'
+    : data.cycleReadiness.map(c => `
+        <div class="stale-row">
+          <span>${c.cycleName}</span>
+          <span>${c.readyCount} of ${c.totalPeople} fully covered</span>
+        </div>`).join("");
+
+  panel.innerHTML = `
+    <div class="insight-cards">
+      <div class="insight-card">
+        <p class="big">${data.coverage.percent}%</p>
+        <p class="label">Coverage (${data.coverage.withEvidence} of ${data.coverage.total} tag-slots have evidence)</p>
+      </div>
+      <div class="insight-card">
+        <p class="big">${data.goingStale.length}</p>
+        <p class="label">Going stale (no notes in 30+ days, or ever)</p>
+      </div>
+    </div>
+
+    <p class="insight-section-title">Going stale</p>
+    ${staleRows}
+
+    <p class="insight-section-title">Logging cadence (notes per week)</p>
+    <div class="chart">${chartBars || '<p style="font-size:12px;color:var(--muted);">No notes logged yet.</p>'}</div>
+
+    <p class="insight-section-title">Cycle readiness</p>
+    ${readinessRows}
+  `;
+}
+
+loadPeople();
+</script>
+</body>
+</html>
