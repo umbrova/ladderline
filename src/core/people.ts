@@ -1,7 +1,7 @@
-import { existsSync, mkdirSync, writeFileSync, readFileSync, readdirSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync, readFileSync, readdirSync, renameSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { load as parseYaml, dump as dumpYaml } from "js-yaml";
-import { PersonAlreadyTrackedError, InvalidRelationshipError, LadderNotFoundError } from "./errors.js";
+import { PersonAlreadyTrackedError, PersonNotTrackedError, InvalidRelationshipError, LadderNotFoundError } from "./errors.js";
 import { listLadders } from "./ladder.js";
 
 export const VALID_RELATIONSHIPS = ["report", "self", "mentee", "cross-team", "peer"] as const;
@@ -68,7 +68,30 @@ export function listTrackedPeople(
   workspacePath: string
 ): Array<{ slug: string; record: PersonRecord }> {
   return readdirSync(workspacePath, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory() && entry.name !== "ladders")
+    .filter((entry) => entry.isDirectory() && entry.name !== "ladders" && entry.name !== "archived")
     .filter((entry) => existsSync(join(workspacePath, entry.name, "person.yaml")))
     .map((entry) => ({ slug: entry.name, record: loadPersonBySlug(workspacePath, entry.name) }));
+}
+
+export function archivePerson(workspacePath: string, name: string): void {
+  if (!isTracked(workspacePath, name)) {
+    throw new PersonNotTrackedError(name);
+  }
+  const slug = slugify(name);
+  mkdirSync(join(workspacePath, "archived"), { recursive: true });
+  renameSync(join(workspacePath, slug), join(workspacePath, "archived", slug));
+}
+
+export function purgePerson(workspacePath: string, name: string): void {
+  const slug = slugify(name);
+  const activePath = join(workspacePath, slug);
+  const archivedPath = join(workspacePath, "archived", slug);
+
+  if (existsSync(join(activePath, "person.yaml"))) {
+    rmSync(activePath, { recursive: true, force: true });
+  } else if (existsSync(join(archivedPath, "person.yaml"))) {
+    rmSync(archivedPath, { recursive: true, force: true });
+  } else {
+    throw new PersonNotTrackedError(name);
+  }
 }

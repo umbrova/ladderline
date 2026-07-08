@@ -173,3 +173,27 @@ export class EmptyCaseError extends LadderlineError {
     );
   }
 }
+
+export class NoteNotFoundError extends LadderlineError {
+  constructor(personName: string) {
+    super(`No note matches those details for ${personName}.`, `Nothing was changed.`);
+  }
+}
+
+export class AmbiguousNoteError extends LadderlineError {
+  constructor(personName: string, candidates: string[]) {
+    super(
+      `More than one note matches for ${personName}: ${candidates.join(", ")}`,
+      `Be more specific, or pass --filename <exact file> to pick one.`
+    );
+  }
+}
+
+export class LadderInUseError extends LadderlineError {
+  constructor(filename: string, people: string[]) {
+    super(
+      `${people.length} ${people.length === 1 ? "person is" : "people are"} still assigned to ${filename}: ${people.join(", ")}`,
+      `Reassign them first, or use --force to remove it anyway.`
+    );
+  }
+}
