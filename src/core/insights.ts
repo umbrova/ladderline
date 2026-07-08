@@ -108,3 +108,13 @@ export function buildInsights(workspacePath: string, asOf: Date = new Date()): I
 
   return { coverage, goingStale, cadence, cycleReadiness };
 }
+
+export function buildStalenessNudgeText(workspacePath: string, asOf: Date = new Date()): string | null {
+  const { goingStale } = buildInsights(workspacePath, asOf);
+  if (goingStale.length === 0) return null;
+
+  const uniqueNames = Array.from(new Set(goingStale.map((s) => s.personName)));
+  const verb = uniqueNames.length === 1 ? "has" : "have";
+  const noun = uniqueNames.length === 1 ? "person" : "people";
+  return `${uniqueNames.length} ${noun} ${verb} gaps in their evidence (stale or missing 30+ days): ${uniqueNames.join(", ")}`;
+}

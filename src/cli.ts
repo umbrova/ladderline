@@ -12,6 +12,8 @@ import { runNotagList } from "./commands/notag.js";
 import { runExport } from "./commands/export.js";
 import { runImport } from "./commands/import.js";
 import { runDashboard } from "./commands/dashboard.js";
+import { findWorkspaceRoot } from "./core/workspace.js";
+import { buildStalenessNudgeText } from "./core/insights.js";
 
 const program = new Command();
 
@@ -19,6 +21,17 @@ program
   .name("ladderline")
   .description("Track career-ladder evidence, locally, as it happens.")
   .version("0.1.0");
+
+program.hook("preAction", (thisCommand, actionCommand) => {
+  if (actionCommand.name() === "init") return;
+  try {
+    const workspace = findWorkspaceRoot();
+    const nudge = buildStalenessNudgeText(workspace);
+    if (nudge) console.log(`ℹ ${nudge}\n`);
+  } catch {
+    // no workspace yet, or nothing tracked — nothing to nudge about
+  }
+});
 
 program
   .command("init")
