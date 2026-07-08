@@ -5,6 +5,7 @@ import { runLadderList, runLadderAdd } from "./commands/ladder.js";
 import { runTrack } from "./commands/track.js";
 import { runNote } from "./commands/note.js";
 import { runCycleAdd, runCycleList } from "./commands/cycle.js";
+import { runCase } from "./commands/case.js";
 
 const program = new Command();
 
@@ -73,6 +74,23 @@ cycleCmd
   .description("Show defined cycles")
   .action(() => {
     runCycleList();
+  });
+
+program
+  .command("case [name]")
+  .description("Assemble a case for one person, or all tracked people with --all")
+  .requiredOption("--cycle <name>", "which defined cycle to pull notes from")
+  .option("--format <format>", "docx (default) or md", "docx")
+  .option("--all", "generate for every tracked person (optionally filtered with --as)")
+  .option("--as <relationship>", "with --all, only report | self | mentee | cross-team | peer")
+  .option("--prompt", "also write a sibling .prompt.txt for pasting into an LLM")
+  .action(async (name: string | undefined, options: { cycle: string; format: "docx" | "md"; all?: boolean; as?: string; prompt?: boolean }) => {
+    if (!options.all && !name) {
+      console.error("✗ Provide a person's name, or use --all to generate for everyone.");
+      process.exitCode = 1;
+      return;
+    }
+    await runCase(name ?? "", options);
   });
 
 program.parse(process.argv);
