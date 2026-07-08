@@ -1,11 +1,13 @@
-import { existsSync, readdirSync, readFileSync, copyFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, copyFileSync, unlinkSync } from "node:fs";
 import { join, basename } from "node:path";
 import { load as parseYaml } from "js-yaml";
 import {
   InvalidLadderFileError,
   LadderAlreadyExistsError,
   LadderNotFoundError,
+  LadderInUseError,
 } from "./errors.js";
+import { listTrackedPeople } from "./people.js";
 
 export interface Competency {
   id: string;
@@ -91,4 +93,22 @@ export function loadLadder(workspacePath: string, filename: string): Ladder {
 
 export function getValidTags(ladder: Ladder): string[] {
   return ladder.competencies.map((c) => c.id);
+}
+
+export function removeLadder(
+  workspacePath: string,
+  filename: string,
+  options: { force?: boolean }
+): void {
+  if (!listLadders(workspacePath).includes(filename)) {
+    throw new LadderNotFoundError(filename, listLadders(workspacePath));
+  }
+
+  const assigned = listTrackedPeople(workspacePath).filter((p) => p.record.ladder === filename);
+
+  if (assigned.length > 0 && !options.force) {
+    throw new LadderInUseError(filename, assigned.map((p) => p.record.name));
+  }
+
+  unlinkSync(join(workspacePath, "ladders", filename));
 }

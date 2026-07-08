@@ -1,5 +1,5 @@
 import { findWorkspaceRoot } from "../core/workspace.js";
-import { addCycle, listCycles } from "../core/cycles.js";
+import { addCycle, listCycles, removeCycle } from "../core/cycles.js";
 import { LadderlineError } from "../core/errors.js";
 
 function handleError(err: unknown): void {
@@ -32,6 +32,17 @@ export function runCycleList(): void {
     }
     console.log("Defined cycles:");
     for (const c of cycles) console.log(`  - ${c.name} (${c.start} to ${c.end})`);
+  } catch (err) {
+    handleError(err);
+  }
+}
+
+export function runCycleRemove(name: string): void {
+  try {
+    const workspace = findWorkspaceRoot();
+    const result = removeCycle(workspace, name);
+    console.log(`✓ Removed cycle: ${name}`);
+    if (result.warning) console.warn(`⚠ ${result.warning}`);
   } catch (err) {
     handleError(err);
   }

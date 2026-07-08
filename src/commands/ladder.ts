@@ -1,5 +1,5 @@
 import { findWorkspaceRoot } from "../core/workspace.js";
-import { listLadders, addLadder } from "../core/ladder.js";
+import { listLadders, addLadder, removeLadder } from "../core/ladder.js";
 import { LadderlineError } from "../core/errors.js";
 
 function handleError(err: unknown): void {
@@ -32,6 +32,16 @@ export function runLadderAdd(filePath: string): void {
     const workspace = findWorkspaceRoot();
     const filename = addLadder(workspace, filePath);
     console.log(`✓ Registered ladder: ${filename}`);
+  } catch (err) {
+    handleError(err);
+  }
+}
+
+export function runLadderRemove(filename: string, options: { force?: boolean }): void {
+  try {
+    const workspace = findWorkspaceRoot();
+    removeLadder(workspace, filename, options);
+    console.log(`✓ Removed ladder: ${filename}`);
   } catch (err) {
     handleError(err);
   }

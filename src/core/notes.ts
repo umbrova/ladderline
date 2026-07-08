@@ -1,10 +1,10 @@
-import { existsSync, mkdirSync, writeFileSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync, readdirSync, readFileSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import { load as parseYaml, dump as dumpYaml } from "js-yaml";
 import { isTracked, loadPerson, slugify, listTrackedPeople } from "./people.js";
 import { loadLadder, getValidTags } from "./ladder.js";
 import { findCycleForDate } from "./cycles.js";
-import { PersonNotTrackedError, MissingTagError, InvalidTagError } from "./errors.js";
+import { PersonNotTrackedError, MissingTagError, InvalidTagError, NoteNotFoundError, AmbiguousNoteError } from "./errors.js";
 
 export interface NoteFrontmatter {
   person: string;
@@ -116,6 +116,52 @@ export function listNotes(
       const frontmatter = parseYaml(frontmatterRaw) as NoteFrontmatter;
       return { filename, frontmatter, body: bodyParts.join("---\n").trim() };
     });
+}
+
+export function findMatchingNotes(
+  workspacePath: string,
+  personName: string,
+  options: { tag?: string; notag?: boolean; date: string }
+): Array<{ filename: string; frontmatter: NoteFrontmatter; body: string }> {
+  return listNotes(workspacePath, personName).filter((n) => {
+    if (n.frontmatter.date !== options.date) return false;
+    if (options.notag) return !n.frontmatter.tag;
+    return n.frontmatter.tag === options.tag;
+  });
+}
+
+export function deleteNote(
+  workspacePath: string,
+  personName: string,
+  options: { tag?: string; notag?: boolean; date: string; filename?: string }
+): string {
+  if (!isTracked(workspacePath, personName)) {
+    throw new PersonNotTrackedError(personName);
+  }
+
+  const personDir = join(workspacePath, slugify(personName));
+
+  if (options.filename) {
+    const path = join(personDir, options.filename);
+    if (!existsSync(path)) throw new NoteNotFoundError(personName);
+    unlinkSync(path);
+    return path;
+  }
+
+  const matches = findMatchingNotes(workspacePath, personName, {
+    tag: options.tag,
+    notag: options.notag,
+    date: options.date,
+  });
+
+  if (matches.length === 0) throw new NoteNotFoundError(personName);
+  if (matches.length > 1) {
+    throw new AmbiguousNoteError(personName, matches.map((m) => m.filename));
+  }
+
+  const path = join(personDir, matches[0].filename);
+  unlinkSync(path);
+  return path;
 }
 
 

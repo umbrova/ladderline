@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 import { runInit } from "./commands/init.js";
-import { runLadderList, runLadderAdd } from "./commands/ladder.js";
+import { runLadderList, runLadderAdd, runLadderRemove } from "./commands/ladder.js";
 import { runTrack } from "./commands/track.js";
+import { runUntrack } from "./commands/untrack.js";
 import { runNote } from "./commands/note.js";
-import { runCycleAdd, runCycleList } from "./commands/cycle.js";
+import { runNoteDelete } from "./commands/note-delete.js";
+import { runCycleAdd, runCycleList, runCycleRemove } from "./commands/cycle.js";
 import { runCase } from "./commands/case.js";
 import { runNotagList } from "./commands/notag.js";
 import { runExport } from "./commands/export.js";
@@ -41,6 +43,14 @@ ladderCmd
     runLadderAdd(file);
   });
 
+ladderCmd
+  .command("remove <file>")
+  .description("Remove a registered ladder")
+  .option("--force", "remove even if people are still assigned to it")
+  .action((file: string, options: { force?: boolean }) => {
+    runLadderRemove(file, options);
+  });
+
 program
   .command("track <name>")
   .description("Start tracking a person")
@@ -48,6 +58,14 @@ program
   .requiredOption("--as <relationship>", "report | self | mentee | cross-team | peer")
   .action((name: string, options: { ladder: string; as: string }) => {
     runTrack(name, options);
+  });
+
+program
+  .command("untrack <name>")
+  .description("Stop tracking a person (archives by default, --purge to delete permanently)")
+  .option("--purge", "permanently delete all data for this person, asks twice to confirm")
+  .action(async (name: string, options: { purge?: boolean }) => {
+    await runUntrack(name, options);
   });
 
 program
@@ -59,6 +77,18 @@ program
   .option("--date <date>", "YYYY-MM-DD, defaults to today")
   .action((text: string, options: { person: string; tag?: string; notag?: boolean; date?: string }) => {
     runNote(options.person, text, { tag: options.tag, notag: options.notag, date: options.date });
+  });
+
+program
+  .command("note-delete")
+  .description("Delete a single note (always confirms first)")
+  .requiredOption("--person <name>", "the tracked person this note belongs to")
+  .requiredOption("--date <date>", "YYYY-MM-DD")
+  .option("--tag <id>", "the tag on the note to delete")
+  .option("--notag", "delete a notag entry instead of a tagged one")
+  .option("--filename <name>", "pick an exact file if --tag/--date matches more than one")
+  .action(async (options: { person: string; date: string; tag?: string; notag?: boolean; filename?: string }) => {
+    await runNoteDelete(options.person, options);
   });
 
 const cycleCmd = program.command("cycle").description("Manage review cycles");
@@ -77,6 +107,13 @@ cycleCmd
   .description("Show defined cycles")
   .action(() => {
     runCycleList();
+  });
+
+cycleCmd
+  .command("remove <name>")
+  .description("Remove a defined cycle")
+  .action((name: string) => {
+    runCycleRemove(name);
   });
 
 program
