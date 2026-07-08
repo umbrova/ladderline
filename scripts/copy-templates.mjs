@@ -5,4 +5,5 @@
 import { cpSync } from "node:fs";
 
 cpSync("src/templates", "dist/templates", { recursive: true });
-console.log("Copied templates to dist/templates");
+cpSync("src/dashboard/public", "dist/dashboard/public", { recursive: true });
+console.log("Copied templates and dashboard assets to dist/");

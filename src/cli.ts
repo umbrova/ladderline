@@ -11,6 +11,7 @@ import { runCase } from "./commands/case.js";
 import { runNotagList } from "./commands/notag.js";
 import { runExport } from "./commands/export.js";
 import { runImport } from "./commands/import.js";
+import { runDashboard } from "./commands/dashboard.js";
 
 const program = new Command();
 
@@ -159,6 +160,14 @@ program
   .option("--force", "overwrite files that already exist with different content")
   .action((file: string, options: { force?: boolean }) => {
     runImport(file, options);
+  });
+
+program
+  .command("dashboard")
+  .description("Launch the local web dashboard")
+  .option("--port <port>", "port to listen on", "4200")
+  .action((options: { port?: string }) => {
+    runDashboard(options);
   });
 
 program.parse(process.argv);

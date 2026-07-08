@@ -77,6 +77,27 @@ export function addNote(
   return { path: filePath, warning };
 }
 
+export function listAllNotes(
+  workspacePath: string,
+  filters: { person?: string; tag?: string; cycle?: string; notagOnly?: boolean }
+): Array<{ personName: string; filename: string; frontmatter: NoteFrontmatter; body: string }> {
+  const targets = filters.person
+    ? [filters.person]
+    : listTrackedPeople(workspacePath).map((p) => p.record.name);
+
+  const result: Array<{ personName: string; filename: string; frontmatter: NoteFrontmatter; body: string }> = [];
+  for (const name of targets) {
+    for (const note of listNotes(workspacePath, name)) {
+      if (filters.tag && note.frontmatter.tag !== filters.tag) continue;
+      if (filters.cycle && note.frontmatter.cycle !== filters.cycle) continue;
+      if (filters.notagOnly && note.frontmatter.tag) continue;
+      result.push({ personName: name, ...note });
+    }
+  }
+
+  return result.sort((a, b) => b.frontmatter.date.localeCompare(a.frontmatter.date));
+}
+
 /**
  * Notes without a tag, either for one person or across everyone tracked.
  * This is the same underlying data as the dashboard's "Notes" tab
@@ -86,19 +107,7 @@ export function listNotagNotes(
   workspacePath: string,
   personName?: string
 ): Array<{ personName: string; filename: string; frontmatter: NoteFrontmatter; body: string }> {
-  const targets = personName
-    ? [personName]
-    : listTrackedPeople(workspacePath).map((p) => p.record.name);
-
-  const result: Array<{ personName: string; filename: string; frontmatter: NoteFrontmatter; body: string }> = [];
-  for (const name of targets) {
-    for (const note of listNotes(workspacePath, name)) {
-      if (!note.frontmatter.tag) {
-        result.push({ personName: name, ...note });
-      }
-    }
-  }
-  return result;
+  return listAllNotes(workspacePath, { person: personName, notagOnly: true });
 }
 
 export function listNotes(
