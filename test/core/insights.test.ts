@@ -6,7 +6,7 @@ import { createWorkspace } from "../../src/core/workspace.js";
 import { trackPerson } from "../../src/core/people.js";
 import { addCycle } from "../../src/core/cycles.js";
 import { addNote } from "../../src/core/notes.js";
-import { buildInsights } from "../../src/core/insights.js";
+import { buildInsights, buildStalenessNudgeText } from "../../src/core/insights.js";
 
 const FIXED_NOW = new Date("2026-03-01T00:00:00Z");
 
@@ -76,5 +76,44 @@ describe("buildInsights", () => {
     const readiness = insights.cycleReadiness.find((c) => c.cycleName === "2026-Q1")!;
     expect(readiness.readyCount).toBe(1);
     expect(readiness.totalPeople).toBe(2);
+  });
+});
+describe("buildStalenessNudgeText", () => {
+  let testDir: string;
+  let workspace: string;
+
+  beforeEach(() => {
+    testDir = mkdtempSync(join(tmpdir(), "ladderline-test-"));
+    workspace = createWorkspace(testDir);
+  });
+
+  afterEach(() => {
+    rmSync(testDir, { recursive: true, force: true });
+  });
+
+  it("returns null when nothing is stale", () => {
+    trackPerson(workspace, "Sarah Chen", { ladder: "generic-ic-ladder.yaml", as: "report" });
+    addNote(workspace, "Sarah Chen", { tag: "technical-execution", date: "2026-02-28", text: "a" });
+    addNote(workspace, "Sarah Chen", { tag: "technical-direction", date: "2026-02-28", text: "b" });
+    addNote(workspace, "Sarah Chen", { tag: "mentorship", date: "2026-02-28", text: "c" });
+    addNote(workspace, "Sarah Chen", { tag: "reliability", date: "2026-02-28", text: "d" });
+
+    expect(buildStalenessNudgeText(workspace, FIXED_NOW)).toBeNull();
+  });
+
+  it("names the person when something is stale", () => {
+    trackPerson(workspace, "Sarah Chen", { ladder: "generic-ic-ladder.yaml", as: "report" });
+    const text = buildStalenessNudgeText(workspace, FIXED_NOW);
+    expect(text).toContain("Sarah Chen");
+    expect(text).toContain("1 person");
+  });
+
+  it("uses plural wording for more than one person", () => {
+    trackPerson(workspace, "Sarah Chen", { ladder: "generic-ic-ladder.yaml", as: "report" });
+    trackPerson(workspace, "Raj Patel", { ladder: "generic-ic-ladder.yaml", as: "report" });
+    const text = buildStalenessNudgeText(workspace, FIXED_NOW);
+    expect(text).toContain("2 people");
+    expect(text).toContain("Sarah Chen");
+    expect(text).toContain("Raj Patel");
   });
 });
