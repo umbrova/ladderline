@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, writeFileSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { load as parseYaml, dump as dumpYaml } from "js-yaml";
-import { isTracked, loadPerson, slugify } from "./people.js";
+import { isTracked, loadPerson, slugify, listTrackedPeople } from "./people.js";
 import { loadLadder, getValidTags } from "./ladder.js";
 import { findCycleForDate } from "./cycles.js";
 import { PersonNotTrackedError, MissingTagError, InvalidTagError } from "./errors.js";
@@ -77,6 +77,30 @@ export function addNote(
   return { path: filePath, warning };
 }
 
+/**
+ * Notes without a tag, either for one person or across everyone tracked.
+ * This is the same underlying data as the dashboard's "Notes" tab
+ * filtered to tag: none — one implementation, not two.
+ */
+export function listNotagNotes(
+  workspacePath: string,
+  personName?: string
+): Array<{ personName: string; filename: string; frontmatter: NoteFrontmatter; body: string }> {
+  const targets = personName
+    ? [personName]
+    : listTrackedPeople(workspacePath).map((p) => p.record.name);
+
+  const result: Array<{ personName: string; filename: string; frontmatter: NoteFrontmatter; body: string }> = [];
+  for (const name of targets) {
+    for (const note of listNotes(workspacePath, name)) {
+      if (!note.frontmatter.tag) {
+        result.push({ personName: name, ...note });
+      }
+    }
+  }
+  return result;
+}
+
 export function listNotes(
   workspacePath: string,
   personName: string
@@ -93,3 +117,5 @@ export function listNotes(
       return { filename, frontmatter, body: bodyParts.join("---\n").trim() };
     });
 }
+
+
