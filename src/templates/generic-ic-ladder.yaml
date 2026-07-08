@@ -1,0 +1,18 @@
+ladder: "Generic — Mid-level to Senior Engineer"
+competencies:
+  - id: technical-execution
+    name: "Technical Execution"
+    current_level: "Delivers well-scoped work independently"
+    next_level: "Takes on ambiguous problems and defines the scope themself"
+  - id: technical-direction
+    name: "Technical Direction"
+    current_level: "Makes sound decisions within their own code"
+    next_level: "Influences design decisions beyond their own work"
+  - id: mentorship
+    name: "Mentorship"
+    current_level: "Answers questions when asked"
+    next_level: "Proactively grows less experienced teammates"
+  - id: reliability
+    name: "Reliability & Ownership"
+    current_level: "Owns their assigned work through completion"
+    next_level: "Owns outcomes, including the parts nobody assigned"
