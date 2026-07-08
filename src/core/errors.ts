@@ -114,3 +114,43 @@ export function findClosestMatch(input: string, options: string[]): string | und
   const threshold = Math.max(2, Math.floor(input.length / 3));
   return bestDistance <= threshold ? best : undefined;
 }
+
+export class PersonNotTrackedError extends LadderlineError {
+  constructor(name: string) {
+    super(
+      `"${name}" isn't tracked yet.`,
+      `Run: ladderline track "${name}" --ladder <file> --as <report|self|mentee|cross-team|peer>`
+    );
+  }
+}
+
+export class MissingTagError extends LadderlineError {
+  constructor() {
+    super(
+      `A note needs either --tag <id> or the explicit --notag flag.`,
+      `This is deliberate — it stops a tag from being silently skipped by accident.`
+    );
+  }
+}
+
+export class InvalidTagError extends LadderlineError {
+  constructor(tag: string, validTags: string[]) {
+    const closest = findClosestMatch(tag, validTags);
+    super(
+      `"${tag}" isn't a competency on this person's ladder.`,
+      closest ? `Did you mean: ${closest}?` : `Use --notag if this genuinely doesn't fit a tag yet.`
+    );
+  }
+}
+
+export class CycleAlreadyExistsError extends LadderlineError {
+  constructor(name: string) {
+    super(`A cycle named "${name}" already exists.`, `Nothing was changed.`);
+  }
+}
+
+export class InvalidDateRangeError extends LadderlineError {
+  constructor(start: string, end: string) {
+    super(`Invalid cycle range: start (${start}) must be before end (${end}).`);
+  }
+}
