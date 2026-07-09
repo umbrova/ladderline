@@ -16,7 +16,7 @@ export class LadderlineError extends Error {
 export class WorkspaceAlreadyExistsError extends LadderlineError {
   constructor(path: string) {
     super(
-      `A Ladderline workspace already exists at ${path}.`,
+      `A Ladderline workspace already exists  at "${path}".`,
       `Nothing was changed. Delete that folder first if you really want to start over.`
     );
   }
@@ -34,7 +34,7 @@ export class WorkspaceNotFoundError extends LadderlineError {
 export class InvalidLadderFileError extends LadderlineError {
   constructor(path: string, reason: string) {
     super(
-      `"${path}" isn't a valid ladder file: ${reason}`,
+      `"${path}" isn't a valid ladder file: ${reason}.`,
       `A ladder needs a "ladder" name and a "competencies" list, each with an "id" and "name".`
     );
   }
@@ -151,7 +151,10 @@ export class CycleAlreadyExistsError extends LadderlineError {
 
 export class InvalidDateRangeError extends LadderlineError {
   constructor(start: string, end: string) {
-    super(`Invalid cycle range: start (${start}) must be before end (${end}).`);
+    super(
+      `Invalid cycle range: start (${start}) must be before end (${end}).`,
+      `Check the --start and --end dates and try again.`
+    );
   }
 }
 
@@ -168,7 +171,7 @@ export class CycleNotFoundError extends LadderlineError {
 export class EmptyCaseError extends LadderlineError {
   constructor(personName: string, cycleName: string) {
     super(
-      `No notes found for ${personName} in cycle ${cycleName}.`,
+      `No notes found for "${personName}" in cycle "${cycleName}".`,
       `Nothing to build a case from yet.`
     );
   }
@@ -176,14 +179,14 @@ export class EmptyCaseError extends LadderlineError {
 
 export class NoteNotFoundError extends LadderlineError {
   constructor(personName: string) {
-    super(`No note matches those details for ${personName}.`, `Nothing was changed.`);
+    super(`No note matches those details for "${personName}".`, `Nothing was changed.`);
   }
 }
 
 export class AmbiguousNoteError extends LadderlineError {
   constructor(personName: string, candidates: string[]) {
     super(
-      `More than one note matches for ${personName}: ${candidates.join(", ")}`,
+      `More than one note matches for "${personName}": ${candidates.join(", ")}`,
       `Be more specific, or pass --filename <exact file> to pick one.`
     );
   }
@@ -192,7 +195,7 @@ export class AmbiguousNoteError extends LadderlineError {
 export class LadderInUseError extends LadderlineError {
   constructor(filename: string, people: string[]) {
     super(
-      `${people.length} ${people.length === 1 ? "person is" : "people are"} still assigned to ${filename}: ${people.join(", ")}`,
+      `${people.length} ${people.length === 1 ? "person is" : "people are"} still assigned to "${filename}": ${people.join(", ")}`,
       `Reassign them first, or use --force to remove it anyway.`
     );
   }
