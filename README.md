@@ -57,7 +57,7 @@ Track anyone with `--as report | self | mentee | cross-team | peer` — the mech
 
 | Command | What it does |
 |---|---|
-| `ladderline init` | Create a new workspace in the current folder |
+| `ladderline init [--demo]` | Create a new workspace, optionally seeded with a demo person and one deliberate evidence gap |
 | `ladderline ladder list` | Show ladders registered in this workspace |
 | `ladderline ladder add <file>` | Register a ladder file |
 | `ladderline ladder remove <file> [--force]` | Remove a registered ladder |
@@ -76,18 +76,17 @@ Track anyone with `--as report | self | mentee | cross-team | peer` — the mech
 
 Every command supports `--help`. Full details, file formats, and conventions live in the [wiki](../../wiki).
 
-## Known limitations (v0.1)
 
-- **No sample/demo data yet.** `init` accepts a `--demo` flag, but seeding a realistic demo workspace isn't implemented yet — it currently just prints a note saying so. A separate standalone `ladderline demo` command (a fully throwaway workspace) was planned but hasn't been built either. Both are reasonable follow-ups, not blockers for real use.
 
 ## The dashboard
 
-`ladderline dashboard` starts a local web server (default `http://localhost:4200`, reachable only on your machine) with four views:
+`ladderline dashboard` starts a local web server (default `http://localhost:4200`, reachable only on your machine) with five views:
 
 - **Person** — one person at a time, each competency as a row, with note counts and how fresh the evidence is
 - **Team grid** — everyone at a glance, competencies as columns, for spotting gaps before calibration
 - **Notes** — every logged note, filterable and expandable to its raw file
 - **Insights** — coverage percentage, what's going stale, your own logging cadence, and cycle readiness
+- **Docs** — the same reference material as the wiki, rendered locally so it works fully offline
 
 A small badge in the top bar surfaces when something needs attention — the same signal also shows up as a one-line nudge before any command's output, right in your terminal.
 
