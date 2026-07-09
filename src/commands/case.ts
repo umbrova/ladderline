@@ -5,7 +5,8 @@ import { buildCaseData, formatCaseAsMarkdown, buildPromptText, CaseData } from "
 import { renderCaseAsDocx } from "../core/case-docx.js";
 import { slugify, listTrackedPeople } from "../core/people.js";
 import { listCycles } from "../core/cycles.js";
-import { LadderlineError, CycleNotFoundError, EmptyCaseError } from "../core/errors.js";
+import { CycleNotFoundError, EmptyCaseError } from "../core/errors.js";
+import { printSuccess, printWarning, printErrorAndSetExitCode } from "./output.js";
 
 interface CaseOptions {
   cycle: string;
@@ -57,11 +58,11 @@ export async function runCase(personName: string, options: CaseOptions): Promise
         try {
           const data = buildCaseData(workspace, person.record.name, options.cycle);
           const outPath = await writeCaseFiles(data, outDir, format, options.prompt);
-          console.log(`✓ ${person.record.name}: ${outPath}`);
+          printSuccess(`${person.record.name}: ${outPath}`);
           generated++;
         } catch (err) {
           if (err instanceof EmptyCaseError) {
-            console.warn(`⚠ Skipped ${person.record.name}: no notes in ${options.cycle}`);
+            printWarning(`Skipped ${person.record.name}: no notes in ${options.cycle}`);
           } else {
             throw err;
           }
@@ -74,14 +75,8 @@ export async function runCase(personName: string, options: CaseOptions): Promise
     const data = buildCaseData(workspace, personName, options.cycle);
     const outDir = join(process.cwd(), "cases", options.cycle);
     const outPath = await writeCaseFiles(data, outDir, format, options.prompt);
-    console.log(`✓ Case written: ${outPath}`);
+    printSuccess(`Case written: ${outPath}`);
   } catch (err) {
-    if (err instanceof LadderlineError) {
-      console.error(`✗ ${err.message}`);
-      if (err.suggestion) console.error(`  ${err.suggestion}`);
-      process.exitCode = 1;
-      return;
-    }
-    throw err;
+    printErrorAndSetExitCode(err);
   }
 }

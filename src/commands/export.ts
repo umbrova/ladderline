@@ -1,6 +1,6 @@
 import { findWorkspaceRoot } from "../core/workspace.js";
 import { buildExportZip } from "../core/export.js";
-import { LadderlineError } from "../core/errors.js";
+import { printSuccess, printErrorAndSetExitCode } from "./output.js";
 
 export function runExport(options: { person?: string; cycle?: string; since?: string }): void {
   try {
@@ -14,14 +14,8 @@ export function runExport(options: { person?: string; cycle?: string; since?: st
     const filename = `${parts.join("-")}.zip`;
 
     zip.writeZip(filename);
-    console.log(`✓ Exported: ${filename}`);
+    printSuccess(`Exported: ${filename}`);
   } catch (err) {
-    if (err instanceof LadderlineError) {
-      console.error(`✗ ${err.message}`);
-      if (err.suggestion) console.error(`  ${err.suggestion}`);
-      process.exitCode = 1;
-      return;
-    }
-    throw err;
+    printErrorAndSetExitCode(err);
   }
 }

@@ -1,7 +1,7 @@
 import { findWorkspaceRoot } from "../core/workspace.js";
 import { archivePerson, purgePerson } from "../core/people.js";
 import { confirmByTyping } from "./prompt.js";
-import { LadderlineError } from "../core/errors.js";
+import { printSuccess, printErrorAndSetExitCode } from "./output.js";
 
 export async function runUntrack(name: string, options: { purge?: boolean }): Promise<void> {
   try {
@@ -9,7 +9,7 @@ export async function runUntrack(name: string, options: { purge?: boolean }): Pr
 
     if (!options.purge) {
       archivePerson(workspace, name);
-      console.log(`✓ Archived "${name}" — recoverable under archived/, run with --purge to delete permanently.`);
+      printSuccess(`Archived "${name}" — recoverable under archived/, run with --purge to delete permanently.`);
       return;
     }
 
@@ -23,14 +23,8 @@ export async function runUntrack(name: string, options: { purge?: boolean }): Pr
     }
 
     purgePerson(workspace, name);
-    console.log(`✓ Permanently deleted all data for "${name}".`);
+    printSuccess(`Permanently deleted all data for "${name}".`);
   } catch (err) {
-    if (err instanceof LadderlineError) {
-      console.error(`✗ ${err.message}`);
-      if (err.suggestion) console.error(`  ${err.suggestion}`);
-      process.exitCode = 1;
-      return;
-    }
-    throw err;
+    printErrorAndSetExitCode(err);
   }
 }

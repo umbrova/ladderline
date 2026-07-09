@@ -1,6 +1,6 @@
 import { findWorkspaceRoot } from "../core/workspace.js";
 import { createDashboardServer } from "../dashboard/server.js";
-import { LadderlineError } from "../core/errors.js";
+import { printSuccess, printErrorAndSetExitCode } from "./output.js";
 
 export function runDashboard(options: { port?: string }): void {
   try {
@@ -9,15 +9,9 @@ export function runDashboard(options: { port?: string }): void {
 
     const app = createDashboardServer(workspace);
     app.listen(port, () => {
-      console.log(`✓ Dashboard running at http://localhost:${port}`);
+      printSuccess(`Dashboard running at http://localhost:${port}`);
     });
   } catch (err) {
-    if (err instanceof LadderlineError) {
-      console.error(`✗ ${err.message}`);
-      if (err.suggestion) console.error(`  ${err.suggestion}`);
-      process.exitCode = 1;
-      return;
-    }
-    throw err;
+    printErrorAndSetExitCode(err);
   }
 }

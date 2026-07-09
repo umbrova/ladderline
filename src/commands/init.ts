@@ -1,6 +1,6 @@
 import { createWorkspace } from "../core/workspace.js";
 import { seedDemoData } from "../core/demo.js";
-import { LadderlineError } from "../core/errors.js";
+import { printSuccess, printErrorAndSetExitCode } from "./output.js";
 
 const BANNER = [
   "                                   ",
@@ -15,12 +15,12 @@ export function runInit(options: { demo?: boolean }): void {
   try {
     const path = createWorkspace(process.cwd());
     console.log(BANNER);
-    console.log(`✓ Created workspace at ${path}`);
-    console.log(`✓ Added default ladder: generic-ic-ladder.yaml`);
+    printSuccess(`Created workspace at ${path}`);
+    printSuccess(`Added default ladder: generic-ic-ladder.yaml`);
 
     if (options.demo) {
       seedDemoData(path);
-      console.log(`✓ Seeded demo data: "Demo Person" with 3 notes (and one deliberate gap)`);
+      printSuccess(`Seeded demo data: "Demo Person" with 3 notes (and one deliberate gap)`);
     }
 
     console.log(`
@@ -31,12 +31,6 @@ Next steps:
 
 Full docs: https://github.com/umbrova/ladderline/wiki`);
   } catch (err) {
-    if (err instanceof LadderlineError) {
-      console.error(`✗ ${err.message}`);
-      if (err.suggestion) console.error(`  ${err.suggestion}`);
-      process.exitCode = 1;
-      return;
-    }
-    throw err;
+    printErrorAndSetExitCode(err);
   }
 }
