@@ -1,28 +1,35 @@
 {
-  "name": "ladderline",
-  "version": "1.0.0",
-  "description": "Coming soon.",
+  "name": "@umbrova/ladderline",
+  "version": "0.1.0",
+  "description": "Track career-ladder evidence, locally, as it happens. A local-first CLI for engineering managers — plain files, no server, nothing invented.",
   "main": "index.js",
-  "type": "module",
-  "bin": {
-    "ladderline": "./dist/cli.js"
-  },
   "scripts": {
     "build": "tsc && node scripts/copy-templates.mjs && node scripts/build-docs.mjs",
     "dev": "tsx src/cli.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "prepublishOnly": "npm run build"
   },
+  "keywords": [
+    "cli",
+    "engineering-management",
+    "career-ladder",
+    "promotion",
+    "performance-review",
+    "local-first"
+  ],
+  "author": "Umbrova",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/umbrova/ladderline.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "homepage": "https://github.com/umbrova/ladderline#readme",
   "bugs": {
     "url": "https://github.com/umbrova/ladderline/issues"
   },
-  "homepage": "https://github.com/umbrova/ladderline#readme",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "devDependencies": {
     "@types/adm-zip": "^0.5.8",
     "@types/express": "^5.0.6",
@@ -39,5 +46,12 @@
     "docx": "^9.7.1",
     "express": "^5.2.1",
     "js-yaml": "^5.2.1"
-  }
+  },
+  "type": "module",
+  "bin": {
+    "ladderline": "./dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ]
 }
