@@ -8,7 +8,7 @@
     "ladderline": "./dist/cli.js"
   },
   "scripts": {
-    "build": "tsc && node scripts/copy-templates.mjs",
+    "build": "tsc && node scripts/copy-templates.mjs && node scripts/build-docs.mjs",
     "dev": "tsx src/cli.ts",
     "test": "vitest run"
   },
@@ -28,6 +28,7 @@
     "@types/express": "^5.0.6",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^26.1.0",
+    "marked": "^18.0.5",
     "tsx": "^4.23.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10"
