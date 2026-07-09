@@ -7,6 +7,7 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
     if (btn.dataset.tab === "grid") loadTeamGrid();
     if (btn.dataset.tab === "notes") loadNotes();
     if (btn.dataset.tab === "insights") loadInsights();
+    if (btn.dataset.tab === "docs") loadDocs();
   });
 });
 
@@ -16,18 +17,17 @@ async function loadPeople() {
   const list = document.getElementById("person-list");
   const main = document.getElementById("main");
 
-  const otherTabs = document.querySelectorAll('.tab-btn:not([data-tab="person"])');
-  otherTabs.forEach(btn => { btn.disabled = people.length === 0; });
-
   if (people.length === 0) {
     list.innerHTML = '<p style="font-size:12px;color:var(--muted);padding:0 4px;">No one tracked yet.</p>';
     main.innerHTML = `
-      <div class="empty-state">
-        No one tracked yet.<br/><br/>
-        Run this in your terminal to get started:<br/>
-        <code style="display:inline-block; margin-top:8px; padding:6px 10px; background:#fff; border:1px solid var(--border); border-radius:6px; font-size:12px;">
-          ladderline track "Name" --ladder generic-ic-ladder.yaml --as report
-        </code>
+      <div class="empty-state-wrap">
+        <div class="empty-state">
+            No one tracked yet.<br/><br/>
+            Run this in your terminal to get started:<br/>
+            <code style="display:inline-block; margin-top:8px; padding:6px 10px; background:#fff; border:1px solid var(--border); border-radius:6px; font-size:12px;">
+            ladderline track "Name" --ladder generic-ic-ladder.yaml --as report
+            </code>
+        </div>
       </div>`;
     return;
   }
@@ -89,7 +89,7 @@ async function loadTeamGrid() {
   const panel = document.getElementById("grid-panel");
 
   if (data.rows.length === 0) {
-    panel.innerHTML = '<div class="empty-state">No one tracked yet.</div>';
+    panel.innerHTML = '<div class="empty-state-wrap"><div class="empty-state">No one tracked yet.</div></div>';
     return;
   }
 
@@ -108,10 +108,15 @@ async function loadTeamGrid() {
 }
 
 let notesPeopleCache = null;
+let notesTotalCount = null;
 
 async function loadNotes(filters = {}) {
   if (!notesPeopleCache) {
     notesPeopleCache = await (await fetch("/api/people")).json();
+  }
+  if (notesTotalCount === null) {
+    const allNotes = await (await fetch("/api/notes")).json();
+    notesTotalCount = allNotes.length;
   }
 
   const params = new URLSearchParams(filters);
@@ -119,9 +124,13 @@ async function loadNotes(filters = {}) {
   const notes = await res.json();
   const panel = document.getElementById("notes-panel");
 
-  const rows = notes.length === 0
-    ? '<div class="empty-state">No notes match this filter.</div>'
-    : notes.map((n, i) => `
+  let rows;
+  if (notes.length === 0 && notesTotalCount === 0) {
+    rows = '<div class="empty-state-wrap"><div class="empty-state">No notes yet — track someone and log a note to get started.</div></div>';
+  } else if (notes.length === 0) {
+    rows = '<div class="empty-state-wrap"><div class="empty-state">No notes match this filter.</div></div>';
+  } else {
+    rows = notes.map((n, i) => `
         <div class="note-row" data-idx="${i}">
           <div class="note-row-summary">
             <span><strong>${n.date}</strong> — ${n.personName} — ${n.tag ?? "(notag)"}</span>
@@ -137,19 +146,22 @@ async function loadNotes(filters = {}) {
             <div class="note-body">${n.body}</div>
           </div>
         </div>`).join("");
+  }
 
   const personOptions = notesPeopleCache.map(p =>
     `<option value="${p.name}" ${filters.person === p.name ? "selected" : ""}>${p.name}</option>`
   ).join("");
 
+  const noNotesAtAll = notesTotalCount === 0 ? "disabled" : "";
+
   panel.innerHTML = `
     <div class="filters">
-      <select id="filter-person">
+      <select id="filter-person" ${noNotesAtAll}>
         <option value="">All people</option>
         ${personOptions}
       </select>
-      <label><input type="checkbox" id="filter-notag" ${filters.notagOnly === "true" ? "checked" : ""} /> notag only</label>
-      <button class="clear-btn" id="clear-filters">Clear filters</button>
+      <label><input type="checkbox" id="filter-notag" ${noNotesAtAll} ${filters.notagOnly === "true" ? "checked" : ""} /> notag only</label>
+      <button class="clear-btn" id="clear-filters" ${noNotesAtAll}>Clear filters</button>
     </div>
     ${rows}
   `;
@@ -175,7 +187,7 @@ async function loadInsights() {
   const panel = document.getElementById("insights-panel");
 
   if (data.coverage.total === 0) {
-    panel.innerHTML = '<div class="empty-state">Track someone and log a note to see insights here.</div>';
+    panel.innerHTML = '<div class="empty-state-wrap"><div class="empty-state">Track someone and log a note to see insights here.</div></div>';
     return;
   }
 
@@ -237,6 +249,59 @@ async function loadStaleBanner() {
   banner.innerHTML = `⚠ ${data.goingStale.length}`;
   banner.title = `${data.goingStale.length} stale — click to view`;
   banner.onclick = () => document.querySelector('.tab-btn[data-tab="insights"]').click();
+}
+
+const DOC_PAGES = [
+  { file: "Home", label: "Home" },
+  { file: "Terminology", label: "Terminology" },
+  { file: "CLI-Reference", label: "CLI Reference" },
+  { file: "File-and-Folder-Conventions", label: "File & Folder Conventions" },
+];
+
+let docsLoaded = false;
+
+function loadDocs() {
+  if (docsLoaded) return;
+  docsLoaded = true;
+
+  const list = document.getElementById("docs-list");
+  list.innerHTML = DOC_PAGES.map(p =>
+    `<div class="person-item" data-doc="${p.file}"><p class="person-name">${p.label}</p></div>`
+  ).join("");
+
+  list.querySelectorAll("[data-doc]").forEach(el => {
+    el.addEventListener("click", () => selectDoc(el.dataset.doc));
+  });
+
+  document.getElementById("docs-content").addEventListener("click", (e) => {
+    const link = e.target.closest("a");
+    if (link && link.getAttribute("href")?.startsWith("#docs/")) {
+      e.preventDefault();
+      selectDoc(link.getAttribute("href").replace("#docs/", ""));
+    }
+  });
+
+  selectDoc("Home");
+}
+
+async function selectDoc(pageName) {
+  document.querySelectorAll("#docs-list [data-doc]").forEach(el => {
+    el.classList.toggle("active", el.dataset.doc === pageName);
+  });
+
+  const res = await fetch(`/docs/${pageName}.html`);
+  const content = document.getElementById("docs-content");
+
+  if (!res.ok) {
+    content.innerHTML = `<div class="empty-state-wrap"><div class="empty-state">Couldn't load "${pageName}".</div></div>`;
+    return;
+  }
+
+  const body = await res.text();
+  const backLink = pageName === "Home"
+    ? ""
+    : `<a href="#docs/Home" class="docs-back">← Home</a>`;
+  content.innerHTML = backLink + body;
 }
 
 loadPeople();
