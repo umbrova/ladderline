@@ -1,16 +1,6 @@
 import { findWorkspaceRoot } from "../core/workspace.js";
 import { listLadders, addLadder, removeLadder } from "../core/ladder.js";
-import { LadderlineError } from "../core/errors.js";
-
-function handleError(err: unknown): void {
-  if (err instanceof LadderlineError) {
-    console.error(`✗ ${err.message}`);
-    if (err.suggestion) console.error(`  ${err.suggestion}`);
-    process.exitCode = 1;
-    return;
-  }
-  throw err;
-}
+import { printSuccess, printErrorAndSetExitCode } from "./output.js";
 
 export function runLadderList(): void {
   try {
@@ -23,7 +13,7 @@ export function runLadderList(): void {
     console.log("Registered ladders:");
     for (const l of ladders) console.log(`  - ${l}`);
   } catch (err) {
-    handleError(err);
+    printErrorAndSetExitCode(err);
   }
 }
 
@@ -31,9 +21,9 @@ export function runLadderAdd(filePath: string): void {
   try {
     const workspace = findWorkspaceRoot();
     const filename = addLadder(workspace, filePath);
-    console.log(`✓ Registered ladder: ${filename}`);
+    printSuccess(`Registered ladder: ${filename}`);
   } catch (err) {
-    handleError(err);
+    printErrorAndSetExitCode(err);
   }
 }
 
@@ -41,8 +31,8 @@ export function runLadderRemove(filename: string, options: { force?: boolean }):
   try {
     const workspace = findWorkspaceRoot();
     removeLadder(workspace, filename, options);
-    console.log(`✓ Removed ladder: ${filename}`);
+    printSuccess(`Removed ladder: ${filename}`);
   } catch (err) {
-    handleError(err);
+    printErrorAndSetExitCode(err);
   }
 }

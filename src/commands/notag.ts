@@ -1,6 +1,6 @@
 import { findWorkspaceRoot } from "../core/workspace.js";
 import { listNotagNotes } from "../core/notes.js";
-import { LadderlineError } from "../core/errors.js";
+import { printErrorAndSetExitCode } from "./output.js";
 
 export function runNotagList(options: { person?: string }): void {
   try {
@@ -18,12 +18,6 @@ export function runNotagList(options: { person?: string }): void {
       console.log(`  - [${n.frontmatter.date}] ${n.personName}: "${snippet}"`);
     }
   } catch (err) {
-    if (err instanceof LadderlineError) {
-      console.error(`✗ ${err.message}`);
-      if (err.suggestion) console.error(`  ${err.suggestion}`);
-      process.exitCode = 1;
-      return;
-    }
-    throw err;
+    printErrorAndSetExitCode(err);
   }
 }

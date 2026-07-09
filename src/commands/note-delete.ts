@@ -1,7 +1,7 @@
 import { findWorkspaceRoot } from "../core/workspace.js";
 import { deleteNote } from "../core/notes.js";
 import { confirm } from "./prompt.js";
-import { LadderlineError } from "../core/errors.js";
+import { printSuccess, printErrorAndSetExitCode } from "./output.js";
 
 export async function runNoteDelete(
   personName: string,
@@ -17,14 +17,8 @@ export async function runNoteDelete(
     }
 
     const path = deleteNote(workspace, personName, options);
-    console.log(`✓ Deleted: ${path}`);
+    printSuccess(`Deleted: ${path}`);
   } catch (err) {
-    if (err instanceof LadderlineError) {
-      console.error(`✗ ${err.message}`);
-      if (err.suggestion) console.error(`  ${err.suggestion}`);
-      process.exitCode = 1;
-      return;
-    }
-    throw err;
+    printErrorAndSetExitCode(err);
   }
 }

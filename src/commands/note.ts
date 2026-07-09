@@ -1,6 +1,6 @@
 import { findWorkspaceRoot } from "../core/workspace.js";
 import { addNote } from "../core/notes.js";
-import { LadderlineError } from "../core/errors.js";
+import { printSuccess, printWarning, printErrorAndSetExitCode } from "./output.js";
 
 export function runNote(
   personName: string,
@@ -10,15 +10,9 @@ export function runNote(
   try {
     const workspace = findWorkspaceRoot();
     const result = addNote(workspace, personName, { ...options, text });
-    console.log(`✓ Note saved: ${result.path}`);
-    if (result.warning) console.warn(`⚠ ${result.warning}`);
+    printSuccess(`Note saved: ${result.path}`);
+    if (result.warning) printWarning(result.warning);
   } catch (err) {
-    if (err instanceof LadderlineError) {
-      console.error(`✗ ${err.message}`);
-      if (err.suggestion) console.error(`  ${err.suggestion}`);
-      process.exitCode = 1;
-      return;
-    }
-    throw err;
+    printErrorAndSetExitCode(err);
   }
 }
