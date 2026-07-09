@@ -1,4 +1,5 @@
 import { createWorkspace } from "../core/workspace.js";
+import { seedDemoData } from "../core/demo.js";
 import { LadderlineError } from "../core/errors.js";
 
 export function runInit(options: { demo?: boolean }): void {
@@ -8,8 +9,15 @@ export function runInit(options: { demo?: boolean }): void {
     console.log(`✓ Added default ladder: generic-ic-ladder.yaml`);
 
     if (options.demo) {
-      console.log(`ℹ --demo seeding arrives once the track/note commands exist (Phase 3–4)`);
+      seedDemoData(path);
+      console.log(`✓ Seeded demo data: "Sam Example" with 3 notes (and one deliberate gap)`);
     }
+
+    console.log(`
+Next steps:
+  1. ladderline track "Name" --ladder generic-ic-ladder.yaml --as report
+  2. ladderline note "what happened" --person "Name" --tag <competency-id>
+  3. ladderline dashboard`);
   } catch (err) {
     if (err instanceof LadderlineError) {
       console.error(`✗ ${err.message}`);
