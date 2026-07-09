@@ -14,9 +14,21 @@ async function loadPeople() {
   const res = await fetch("/api/people");
   const people = await res.json();
   const list = document.getElementById("person-list");
+  const main = document.getElementById("main");
+
+  const otherTabs = document.querySelectorAll('.tab-btn:not([data-tab="person"])');
+  otherTabs.forEach(btn => { btn.disabled = people.length === 0; });
 
   if (people.length === 0) {
     list.innerHTML = '<p style="font-size:12px;color:var(--muted);padding:0 4px;">No one tracked yet.</p>';
+    main.innerHTML = `
+      <div class="empty-state">
+        No one tracked yet.<br/><br/>
+        Run this in your terminal to get started:<br/>
+        <code style="display:inline-block; margin-top:8px; padding:6px 10px; background:#fff; border:1px solid var(--border); border-radius:6px; font-size:12px;">
+          ladderline track "Name" --ladder generic-ic-ladder.yaml --as report
+        </code>
+      </div>`;
     return;
   }
 

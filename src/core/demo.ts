@@ -11,19 +11,19 @@ function daysFromToday(offset: number): string {
 export function seedDemoData(workspacePath: string): void {
   addCycle(workspacePath, "demo-cycle", daysFromToday(-45), daysFromToday(45));
 
-  trackPerson(workspacePath, "Sam Example", { ladder: "generic-ic-ladder.yaml", as: "report" });
+  trackPerson(workspacePath, "Demo Person", { ladder: "generic-ic-ladder.yaml", as: "report" });
 
-  addNote(workspacePath, "Sam Example", {
+  addNote(workspacePath, "Demo Person", {
     tag: "technical-execution",
     date: daysFromToday(-18),
     text: "[DEMO] Shipped the migration to the new build pipeline ahead of schedule.",
   });
-  addNote(workspacePath, "Sam Example", {
+  addNote(workspacePath, "Demo Person", {
     tag: "technical-direction",
     date: daysFromToday(-9),
     text: "[DEMO] Proposed the caching strategy that two other teams later adopted.",
   });
-  addNote(workspacePath, "Sam Example", {
+  addNote(workspacePath, "Demo Person", {
     tag: "mentorship",
     date: daysFromToday(-3),
     text: "[DEMO] Paired weekly with a newer teammate for the past month.",

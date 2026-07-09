@@ -25,19 +25,19 @@ describe("seedDemoData", () => {
     seedDemoData(workspace);
     const people = listTrackedPeople(workspace);
     expect(people).toHaveLength(1);
-    expect(people[0].record.name).toBe("Sam Example");
+    expect(people[0].record.name).toBe("Demo Person");
   });
 
   it("creates 3 notes, all clearly marked as demo content", () => {
     seedDemoData(workspace);
-    const notes = listNotes(workspace, "Sam Example");
+    const notes = listNotes(workspace, "Demo Person");
     expect(notes).toHaveLength(3);
     expect(notes.every((n) => n.body.startsWith("[DEMO]"))).toBe(true);
   });
 
   it("deliberately leaves one competency with zero notes, to demonstrate a gap", () => {
     seedDemoData(workspace);
-    const overview = buildPersonOverview(workspace, "Sam Example");
+    const overview = buildPersonOverview(workspace, "Demo Person");
     const reliability = overview.sections.find((s) => s.tagId === "reliability")!;
     expect(reliability.noteCount).toBe(0);
     const withEvidence = overview.sections.filter((s) => s.noteCount > 0);
@@ -46,7 +46,7 @@ describe("seedDemoData", () => {
 
   it("defines a cycle covering the seeded notes' dates", () => {
     seedDemoData(workspace);
-    const notes = listNotes(workspace, "Sam Example");
+    const notes = listNotes(workspace, "Demo Person");
     expect(notes.every((n) => n.frontmatter.cycle === "demo-cycle")).toBe(true);
   });
 });

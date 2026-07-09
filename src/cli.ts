@@ -22,6 +22,8 @@ program
   .description("Track career-ladder evidence, locally, as it happens.")
   .version("0.1.0");
 
+program.addHelpText("after", "\nFull docs: https://github.com/umbrova/ladderline/wiki");
+
 program.hook("preAction", (thisCommand, actionCommand) => {
   if (actionCommand.name() === "init") return;
   try {
