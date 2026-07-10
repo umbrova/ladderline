@@ -16,15 +16,6 @@ ladderline init --demo      # also seed an obviously-fake demo person + notes
 
 ---
 
-### `ladderline demo`
-Spins up a fully separate, throwaway demo workspace. Never touches an existing real workspace.
-
-```
-ladderline demo
-```
-
----
-
 ### `ladderline ladder list`
 Shows all ladder files currently registered in the workspace.
 
@@ -47,7 +38,7 @@ ladderline ladder add company-ladder.yaml
 Starts tracking a person — creates their folder and records which ladder applies and their relationship to the manager.
 
 ```
-ladderline track "Sarah Chen" --ladder senior-to-staff-eng.yaml --as report
+ladderline track "John Doe" --ladder senior-to-staff-eng.yaml --as report
 ```
 
 | Flag | Values | Required |
@@ -63,7 +54,7 @@ Tracking yourself for your own promotion case works the same way: `ladderline tr
 Logs a single evidence entry against a person.
 
 ```
-ladderline note --person "Sarah Chen" --tag technical-direction \
+ladderline note --person "John Doe" --tag technical-direction \
   --date 2026-02-10 \
   "Pushed back on the caching design in the payments migration doc..."
 ```
@@ -92,7 +83,7 @@ ladderline dashboard
 Assembles a case from that person's notes, grouped by tag, scoped to a cycle. Never invents or paraphrases — only assembles what was actually logged.
 
 ```
-ladderline case "Sarah Chen" --cycle 2026-Q1 --format docx
+ladderline case "John Doe" --cycle 2026-Q1 --format docx
 ```
 
 | Flag | Values | Required |
@@ -103,10 +94,10 @@ ladderline case "Sarah Chen" --cycle 2026-Q1 --format docx
 
 Refuses to run if there are zero notes for that person in the given cycle.
 
-**`--prompt`** generates a sibling `.prompt.txt` file alongside the case (e.g. `sarah-chen.prompt.txt`) — a ready-made prompt the user can paste into any LLM (Claude, ChatGPT, a local model) to turn the extractive case into polished narrative prose. Ladderline never calls an LLM itself; this keeps the core tool fully deterministic and puts the "invention" step explicitly in the user's hands, outside the tool. The prompt embeds its own guardrails (never invent or embellish beyond what's given, state gaps plainly rather than fabricating strengths, keep dates for traceability).
+**`--prompt`** generates a sibling `.prompt.txt` file alongside the case (e.g. `john-doe.prompt.txt`) — a ready-made prompt the user can paste into any LLM (Claude, ChatGPT, a local model) to turn the extractive case into polished narrative prose. Ladderline never calls an LLM itself; this keeps the core tool fully deterministic and puts the "invention" step explicitly in the user's hands, outside the tool. The prompt embeds its own guardrails (never invent or embellish beyond what's given, state gaps plainly rather than fabricating strengths, keep dates for traceability).
 
 ```
-ladderline case "Sarah Chen" --cycle 2026-Q1 --prompt
+ladderline case "John Doe" --cycle 2026-Q1 --prompt
 ```
 
 **Bulk mode:**
@@ -115,7 +106,7 @@ ladderline case --all --cycle 2026-Q1
 ladderline case --all --cycle 2026-Q1 --as report
 ladderline case --all --cycle 2026-Q1 --prompt
 ```
-Generates one file per tracked person into `./cases/<cycle>/`, e.g. `./cases/2026-Q1/sarah-chen.docx`. `--as` filters to a relationship (e.g. only direct reports). `--prompt` generates one `.prompt.txt` per person alongside each case. Anyone with zero notes that cycle is skipped with a warning; the rest still generate.
+Generates one file per tracked person into `./cases/<cycle>/`, e.g. `./cases/2026-Q1/john-doe.docx`. `--as` filters to a relationship (e.g. only direct reports). `--prompt` generates one `.prompt.txt` per person alongside each case. Anyone with zero notes that cycle is skipped with a warning; the rest still generate.
 
 ---
 
@@ -123,7 +114,7 @@ Generates one file per tracked person into `./cases/<cycle>/`, e.g. `./cases/202
 Lists notag entries (notes without a tag) so they can be reviewed and assigned. Same underlying view as the Notes tab in the dashboard, filtered to `tag: none`.
 
 ```
-ladderline notag list --person "Sarah Chen"
+ladderline notag list --person "John Doe"
 ```
 
 ---
@@ -142,7 +133,7 @@ Zips the entire workspace for backup or transfer to another machine. Accepts opt
 
 ```
 ladderline export                          # full workspace
-ladderline export --person "Devesh Kumar"  # just one person
+ladderline export --person "Jan Kowalski"  # just one person
 ladderline export --cycle 2026-Q1          # just one cycle, across everyone
 ladderline export --since 2026-01-01       # everything logged after a date
 ```
@@ -160,7 +151,7 @@ ladderline import backup-2026-06-01.zip
 - Any `ladders/` files in the zip not already present locally are brought in automatically — a note pointing at a missing ladder would otherwise be orphaned. A note whose ladder truly can't be resolved lands as a **notag** entry with a warning, rather than failing silently.
 - Conflicts are resolved **file-by-file**, not person-by-person — only genuinely overlapping filenames prompt a decision:
   ```
-  ⚠ sarah-chen/2026-02-10-technical-direction.md already exists and differs.
+  ⚠ john-doe/2026-02-10-technical-direction.md already exists and differs.
     Merge (keep both, second file renamed) / Skip (keep existing) / Overwrite (replace)?
   ```
   Choose once for the whole import, or per-file.
@@ -171,7 +162,7 @@ ladderline import backup-2026-06-01.zip
 Removes a single note file. Always asks for confirmation — no `--force` shortcut, given how costly losing evidence is.
 
 ```
-ladderline note delete --person "Sarah Chen" --date 2026-02-10 --tag technical-direction
+ladderline note delete --person "John Doe" --date 2026-02-10 --tag technical-direction
 ⚠ This will permanently delete this note. Are you sure? (y/N)
 ```
 
@@ -181,8 +172,8 @@ ladderline note delete --person "Sarah Chen" --date 2026-02-10 --tag technical-d
 Stops tracking a person. **Archives by default** — moves their folder to `archived/`, out of the dashboard and grid, but not destroyed. "Stopped tracking" and "this evidence never existed" are different intents, so archiving (not deleting) is the default.
 
 ```
-ladderline untrack "Devesh Kumar"              # archives, recoverable
-ladderline untrack "Devesh Kumar" --purge      # permanently deletes everything, asks twice
+ladderline untrack "Jan Kowalski"              # archives, recoverable
+ladderline untrack "Jan Kowalski" --purge      # permanently deletes everything, asks twice
 ```
 
 `--purge` matters for real deletion requests (e.g. GDPR-style) where archiving alone isn't sufficient.

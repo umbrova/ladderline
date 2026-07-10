@@ -11,11 +11,11 @@ ladderline/
 ├── ladders/
 │   ├── senior-to-staff-eng.yaml
 │   └── mid-to-senior-eng.yaml
-├── sarah-chen/
+├── john-doe/
 │   ├── person.yaml                      # ladder assignment + relationship (--as)
 │   ├── 2026-02-10-technical-direction.md
 │   └── 2026-03-22-scope-of-impact.md
-└── raj-patel/
+└── erika-mustermann/
     ├── person.yaml
     └── 2026-03-10-technical-direction.md
 ```
@@ -24,7 +24,7 @@ ladderline/
 
 | What | Rule | Example |
 |---|---|---|
-| Person folder name | kebab-case slug of the display name | `"Sarah Chen"` → `sarah-chen/` |
+| Person folder name | kebab-case slug of the display name | `"John Doe"` → `john-doe/` |
 | Note filename | `<date>-<tag>.md`; if a second note shares the same date+tag, append `-2`, `-3`, etc. | `2026-02-10-technical-direction.md`, `2026-02-10-technical-direction-2.md` |
 | Tag IDs | kebab-case (see [[Naming-Conventions]]) | `technical-direction`, not `technical_direction` |
 | Cycle names | `<year>-Q<n>` recommended, but any string is accepted | `2026-Q1` |
@@ -49,7 +49,7 @@ competencies:
 ### `person.yaml` (one per tracked person)
 
 ```yaml
-name: "Sarah Chen"
+name: "John Doe"
 ladder: senior-to-staff-eng.yaml
 as: report
 ```
@@ -60,7 +60,7 @@ Mostly prose with a few structured fields stapled on top — the standard patter
 
 ```markdown
 ---
-person: sarah-chen
+person: john-doe
 tag: technical-direction
 date: 2026-02-10
 cycle: 2026-Q1
@@ -79,7 +79,7 @@ Hand-creating or hand-editing a note file — in Obsidian, in any text editor, h
 Malformed hand-edits (a missing field, a typo'd tag) must **surface as a visible warning, never silently disappear** from the dashboard or a case — consistent with the error-handling principle in [[Error-Handling]]:
 
 ```
-⚠ sarah-chen/2026-02-10-technical-direction.md has an unrecognized tag
+⚠ john-doe/2026-02-10-technical-direction.md has an unrecognized tag
   "technica-direction". Did you mean: technical-direction?
 ```
 

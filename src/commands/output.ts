@@ -15,6 +15,10 @@ import { LadderlineError } from "../core/errors.js";
 const isInteractive = Boolean(process.stdout.isTTY) || Boolean(process.env.MSYSTEM);
 chalk.level = isInteractive ? 3 : 0;
 
+export function printInfo(message: string): void {
+  console.log(chalk.cyan("ℹ") + " " + message);
+}
+
 export function printSuccess(message: string): void {
   console.log(chalk.green("✓") + " " + message);
 }

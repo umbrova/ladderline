@@ -2,7 +2,7 @@
 
 ## Kebab-case, everywhere an identifier is typed
 
-Tag IDs, `--as` values, person-folder slugs, command names, and flag names all use kebab-case (`technical-direction`, `cross-team`, `sarah-chen`) — never snake_case or camelCase.
+Tag IDs, `--as` values, person-folder slugs, command names, and flag names all use kebab-case (`technical-direction`, `cross-team`, `john-doe`) — never snake_case or camelCase.
 
 This was a deliberate fix: tags originally used snake_case (`technical_direction`) while `--as` values were already kebab-case (`cross-team`), which meant the same CLI used two different conventions depending on which identifier you were typing. Kebab-case won because:
 

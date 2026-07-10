@@ -46,13 +46,20 @@ async function loadPeople() {
   selectPerson(people[0].slug);
 }
 
+let latestPersonRequest = null;
+
 async function selectPerson(slug) {
+  latestPersonRequest = slug;
+
   document.querySelectorAll(".person-item").forEach(el => {
     el.classList.toggle("active", el.dataset.slug === slug);
   });
 
   const res = await fetch(`/api/people/${slug}/overview`);
   const data = await res.json();
+
+  if (latestPersonRequest !== slug) return;
+
   const main = document.getElementById("main");
 
   if (data.error) {

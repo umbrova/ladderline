@@ -2,6 +2,11 @@
 
 **Track career-ladder evidence, locally, as it happens.**
 
+![ladderline init — a workspace created, banner, and next steps](docs/screenshots/cli-init.png)
+
+There's also a local dashboard — [see the full tour with screenshots →](../../wiki/Dashboard-Tour)
+
+
 Every engineering manager knows the feeling: promo season arrives, and you're trying to reconstruct six months of a report's growth from memory, old Slack messages, and a vague sense that *something* good happened in March. Ladderline fixes that by giving you a place to jot a two-line note the moment something evidence-worthy happens — tagged against your team's actual career ladder — so a real, dated record builds itself quietly all year. When it's time to write the case, you're assembling, not remembering.
 
 - **Local-first.** Everything lives in plain YAML/Markdown files on your machine — no server, no account, no database, nothing to trust with sensitive people-data but yourself.
@@ -30,20 +35,20 @@ ladderline init
 ladderline cycle add 2026-Q1 --start 2026-01-01 --end 2026-03-31
 
 # Start tracking someone against the bundled default ladder
-ladderline track "Sarah Chen" --ladder generic-ic-ladder.yaml --as report
+ladderline track "John Doe" --ladder generic-ic-ladder.yaml --as report
 
 # Log evidence the moment something happens — takes 10 seconds
 ladderline note "Pushed back on the caching design, adopted by 3 teams" \
-  --person "Sarah Chen" --tag technical-direction --date 2026-02-10
+  --person "John Doe" --tag technical-direction --date 2026-02-10
 
 # See it all in the local dashboard
 ladderline dashboard
 
 # When review time comes, assemble a case from everything you logged
-ladderline case "Sarah Chen" --cycle 2026-Q1
+ladderline case "John Doe" --cycle 2026-Q1
 ```
 
-That last command writes `./cases/2026-Q1/sarah-chen.docx` — a structured brief grouped by competency, every line traceable to a dated note you actually wrote, with any competency that has zero evidence shown honestly rather than glossed over.
+That last command writes `./cases/2026-Q1/john-doe.docx` — a structured brief grouped by competency, every line traceable to a dated note you actually wrote, with any competency that has zero evidence shown honestly rather than glossed over.
 
 ## What it's for
 
@@ -96,7 +101,7 @@ Every note is Markdown with YAML frontmatter:
 
 ```markdown
 ---
-person: sarah-chen
+person: john-doe
 tag: technical-direction
 date: 2026-02-10
 cycle: 2026-Q1
