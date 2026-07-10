@@ -1,5 +1,7 @@
 # Ladderline
 
+[![npm version](https://img.shields.io/npm/v/@umbrova/ladderline.svg)](https://www.npmjs.com/package/@umbrova/ladderline)
+
 **Track career-ladder evidence, locally, as it happens.**
 
 ![ladderline init — a workspace created, banner, and next steps](docs/screenshots/cli-init.png)
