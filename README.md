@@ -2,6 +2,11 @@
 
 **Track career-ladder evidence, locally, as it happens.**
 
+![ladderline init — a workspace created, banner, and next steps](docs/screenshots/cli-init.png)
+
+There's also a local dashboard — [see the full tour with screenshots →](../../wiki/Dashboard-Tour)
+
+
 Every engineering manager knows the feeling: promo season arrives, and you're trying to reconstruct six months of a report's growth from memory, old Slack messages, and a vague sense that *something* good happened in March. Ladderline fixes that by giving you a place to jot a two-line note the moment something evidence-worthy happens — tagged against your team's actual career ladder — so a real, dated record builds itself quietly all year. When it's time to write the case, you're assembling, not remembering.
 
 - **Local-first.** Everything lives in plain YAML/Markdown files on your machine — no server, no account, no database, nothing to trust with sensitive people-data but yourself.

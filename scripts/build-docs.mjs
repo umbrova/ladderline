@@ -5,12 +5,14 @@ import { marked } from "marked";
 const SRC_DIR = "wiki-src";
 const OUT_DIR = "dist/dashboard/public/docs";
 
-// Contributor-only pages — built and reachable by direct URL, but never
-// linked to from other dashboard pages, so a reader never hits a page
-// with no obvious way back. This only affects the dashboard's rendered
-// HTML; the original [[WikiLink]] syntax stays intact in wiki-src/ for
-// GitHub's own wiki, where these pages are genuinely useful to contributors.
-const HIDDEN_FROM_DASHBOARD = ["Error-Handling", "Testing-Conventions", "Naming-Conventions"];
+// Testing/Error-Handling/Naming-Conventions are contributor-only.
+// Dashboard-Tour is different: it's genuinely for end users, but its
+// screenshot images live only in the real GitHub wiki repo (never
+// bundled into the npm package), so linking to it from the LOCAL
+// dashboard's Docs tab would show broken image icons — a dead end.
+// The page still builds (for anyone reaching it via the real wiki
+// or a direct link), it's just never linked to from another local page.
+const HIDDEN_FROM_DASHBOARD = ["Error-Handling", "Testing-Conventions", "Naming-Conventions", "Dashboard-Tour"];
 
 mkdirSync(OUT_DIR, { recursive: true });
 
