@@ -30,20 +30,20 @@ ladderline init
 ladderline cycle add 2026-Q1 --start 2026-01-01 --end 2026-03-31
 
 # Start tracking someone against the bundled default ladder
-ladderline track "Sarah Chen" --ladder generic-ic-ladder.yaml --as report
+ladderline track "John Doe" --ladder generic-ic-ladder.yaml --as report
 
 # Log evidence the moment something happens — takes 10 seconds
 ladderline note "Pushed back on the caching design, adopted by 3 teams" \
-  --person "Sarah Chen" --tag technical-direction --date 2026-02-10
+  --person "John Doe" --tag technical-direction --date 2026-02-10
 
 # See it all in the local dashboard
 ladderline dashboard
 
 # When review time comes, assemble a case from everything you logged
-ladderline case "Sarah Chen" --cycle 2026-Q1
+ladderline case "John Doe" --cycle 2026-Q1
 ```
 
-That last command writes `./cases/2026-Q1/sarah-chen.docx` — a structured brief grouped by competency, every line traceable to a dated note you actually wrote, with any competency that has zero evidence shown honestly rather than glossed over.
+That last command writes `./cases/2026-Q1/john-doe.docx` — a structured brief grouped by competency, every line traceable to a dated note you actually wrote, with any competency that has zero evidence shown honestly rather than glossed over.
 
 ## What it's for
 
@@ -96,7 +96,7 @@ Every note is Markdown with YAML frontmatter:
 
 ```markdown
 ---
-person: sarah-chen
+person: john-doe
 tag: technical-direction
 date: 2026-02-10
 cycle: 2026-Q1

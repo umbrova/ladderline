@@ -8,10 +8,10 @@ Ladderline uses a fixed, deliberately small vocabulary. Contributors should neve
 | **Tag** | A single competency/row on a ladder | `technical-direction` |
 | **Note** | A single evidence entry — a dated, short record of something observed | "Pushed back on the caching design..." |
 | **Notag** | A note saved without a tag, because it doesn't yet cleanly fit a competency | reuses the word "tag" deliberately — a note either has a tag, or is a notag |
-| **Case** | The final assembled output handed to a calibration process | `ladderline case "Sarah Chen"` |
+| **Case** | The final assembled output handed to a calibration process | `ladderline case "John Doe"` |
 | **Cycle** | A named review period (a date range) that scopes which notes a case pulls from | `2026-Q1` |
 | **Dashboard** | The local web view (person / team grid / insights / notes tabs) | `ladderline dashboard` |
-| **Track** | Start recording evidence about a person | `ladderline track "Sarah Chen"` |
+| **Track** | Start recording evidence about a person | `ladderline track "John Doe"` |
 | **`--as`** | The relationship between the manager and the tracked person | `report`, `self`, `mentee`, `cross-team`, `peer` |
 
 ## Why these specific words
