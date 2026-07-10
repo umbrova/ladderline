@@ -16,15 +16,6 @@ ladderline init --demo      # also seed an obviously-fake demo person + notes
 
 ---
 
-### `ladderline demo`
-Spins up a fully separate, throwaway demo workspace. Never touches an existing real workspace.
-
-```
-ladderline demo
-```
-
----
-
 ### `ladderline ladder list`
 Shows all ladder files currently registered in the workspace.
 

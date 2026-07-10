@@ -14,6 +14,7 @@ import { runImport } from "./commands/import.js";
 import { runDashboard } from "./commands/dashboard.js";
 import { findWorkspaceRoot } from "./core/workspace.js";
 import { buildStalenessNudgeText } from "./core/insights.js";
+import { printInfo } from "./commands/output.js";
 
 const program = new Command();
 
@@ -29,7 +30,7 @@ program.hook("preAction", (thisCommand, actionCommand) => {
   try {
     const workspace = findWorkspaceRoot();
     const nudge = buildStalenessNudgeText(workspace);
-    if (nudge) console.log(`ℹ ${nudge}\n`);
+    if (nudge) printInfo(`${nudge}\n`);
   } catch {
     // no workspace yet, or nothing tracked — nothing to nudge about
   }
